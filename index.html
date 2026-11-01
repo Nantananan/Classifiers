@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound & Image Classifier</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>🎧 Sound & Image Classifier</h1>
+
+  <div class="tabs">
+    <button class="tab active" data-mode="sound">🎤 Sound</button>
+    <button class="tab" data-mode="image">📷 Camera</button>
+  </div>
+
+  <div class="card">
+    <div id="mic-status">🎤 Microphone is off</div>
+
+    <div id="cam-wrap" hidden></div>
+
+    <div id="visual">
+      <div id="ring"></div>
+      <div id="emoji">👀</div>
+      <img id="img" alt="Detected Image">
+    </div>
+    <div id="label">—</div>
+    <div id="hint">Press Start...</div>
+
+    <button id="toggle" class="btn">Start Listening</button>
+    <button id="flip" class="btn secondary" hidden>🔄 Switch Camera</button>
+
+    <div id="bars"></div>
+
+    <details id="settings">
+      <summary>⚙️ Settings</summary>
+      <div id="soundBox">
+        <small>🎤 Sound model link</small>
+        <input type="text" id="soundUrl" placeholder="https://teachablemachine.withgoogle.com/models/XXXXXXX/">
+      </div>
+      <div id="imageBox">
+        <small>📷 Image model link</small>
+        <input type="text" id="imageUrl" placeholder="https://teachablemachine.withgoogle.com/models/YYYYYYY/">
+      </div>
+      <label class="slider">Confidence: <b id="confVal">80</b>%
+        <input type="range" id="conf" min="30" max="99" value="80">
+      </label>
+    </details>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.4.0/dist/speech-commands.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
