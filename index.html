@@ -10,6 +10,8 @@
 <main>
   <h1>🎧 Sound & Image Classifier</h1>
 
+  <div class="layout">
+  <section class="col-main">
   <div class="tabs">
     <button class="tab active" data-mode="sound">🎤 Sound</button>
     <button class="tab" data-mode="image">📷 Camera</button>
@@ -31,8 +33,6 @@
     <button id="toggle" class="btn">Start Listening</button>
     <button id="flip" class="btn secondary" hidden>🔄 Switch Camera</button>
 
-    <div id="bars"></div>
-
     <details id="settings">
       <summary>⚙️ Settings</summary>
       <div id="soundBox">
@@ -47,6 +47,14 @@
         <input type="range" id="conf" min="30" max="99" value="80">
       </label>
     </details>
+  </div>
+  </section>
+
+  <!-- classes appear here, to the right, once it has started -->
+  <aside class="card side" id="side" aria-label="Classes">
+    <h2>Classes</h2>
+    <div id="bars"></div>
+  </aside>
   </div>
 </main>
 

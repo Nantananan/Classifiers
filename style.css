@@ -1,36 +1,95 @@
-:root { --bg:#0f1220; --card:#181c30; --text:#eef0fa; --muted:#8b90ad; --accent:#6c8cff; --good:#4fd6a0; }
+/* =====================================================================
+   GLASS THEME: frosted see-through cards and buttons.
+   Your colours are the variables below. Change them and everything follows.
+   ===================================================================== */
+:root {
+  --bg:#e0e5fc;          /* page background */
+  --card:#ac1804;        /* card tint (shown through the glass) */
+  --text:#0c0c0c;
+  --muted:#661b11;
+  --accent:#e2e7fc;
+  --good:#4fd6a0;        /* glow when something is detected */
+
+  --glass:rgba(255,255,255,.22);          /* light glass (tabs, chips, inputs) */
+  --glass-strong:rgba(255,255,255,.42);   /* buttons */
+  --glass-border:rgba(255,255,255,.60);   /* thin bright edge on every glass piece */
+  --card-tint:rgba(172,24,4,.36);         /* fallback if color-mix is not supported */
+  --blur:20px;
+}
+
 * { box-sizing: border-box; }
 [hidden] { display:none !important; }
-body { margin:0; min-height:100vh; background:radial-gradient(circle at top,#1b2147,var(--bg) 60%);
-       color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-       display:flex; justify-content:center; padding:24px 16px; }
-main { width:100%; max-width:440px; text-align:center; }
-h1 { font-size:1.5rem; margin:8px 0 16px; }
 
-/* Mode tabs */
-.tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--card); padding:6px;
-        border-radius:16px; margin-bottom:14px; }
-.tab { border:0; border-radius:12px; padding:12px; font-size:1rem; font-weight:600; cursor:pointer;
-       background:transparent; color:var(--muted); transition:background .2s, color .2s; }
-.tab.active { background:var(--accent); color:#fff; }
+/* Soft coloured light behind the glass, so there is something to blur */
+body {
+  margin:0; min-height:100vh; color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  display:flex; justify-content:center; padding:24px 16px;
+  background:
+    radial-gradient(45vmax 45vmax at 12% 8%,  rgba(172,24,4,.55),   transparent 70%),
+    radial-gradient(50vmax 50vmax at 95% 28%, rgba(99,102,241,.45), transparent 70%),
+    radial-gradient(55vmax 55vmax at 25% 98%, rgba(236,72,153,.38), transparent 70%),
+    var(--bg);
+  background-attachment:fixed;
+}
+@supports (background:color-mix(in srgb, red 50%, transparent)) {
+  body { background:
+    radial-gradient(45vmax 45vmax at 12% 8%,  color-mix(in srgb, var(--card) 55%, transparent), transparent 70%),
+    radial-gradient(50vmax 50vmax at 95% 28%, rgba(99,102,241,.45), transparent 70%),
+    radial-gradient(55vmax 55vmax at 25% 98%, rgba(236,72,153,.38), transparent 70%),
+    var(--bg);
+    background-attachment:fixed; }
+}
+main { width:100%; max-width:920px; text-align:center; }
+h1 { font-size:1.5rem; margin:8px 0 16px; text-shadow:0 1px 0 rgba(255,255,255,.6); }
 
-.card { background:var(--card); border-radius:24px; padding:24px 20px; box-shadow:0 10px 40px rgba(0,0,0,.35);
-        transition: box-shadow .3s; }
-.card.detected { box-shadow:0 0 0 2px var(--good), 0 10px 50px rgba(79,214,160,.35); }
+/* ---------- Glass pieces share one recipe ---------- */
+.tabs, .card, .btn, #mic-status, details, input[type=text] {
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(160%);
+          backdrop-filter:blur(var(--blur)) saturate(160%);
+  border:1px solid var(--glass-border);
+}
 
-#mic-status { font-size:.95rem; color:var(--muted); margin-bottom:16px; }
-#mic-status.on { color:var(--good); }
+/* ---------- Mode tabs (glass segmented control) ---------- */
+.tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:6px; margin-bottom:14px;
+        border-radius:20px; background:var(--glass);
+        box-shadow:0 6px 24px rgba(31,38,135,.18), inset 0 1px 0 rgba(255,255,255,.7); }
+.tab { border:1px solid transparent; border-radius:14px; padding:12px; font-size:1rem; font-weight:600;
+       cursor:pointer; background:transparent; color:var(--muted);
+       transition:background .25s, color .25s, box-shadow .25s, border-color .25s; }
+.tab.active { background:rgba(255,255,255,.70); color:var(--text); border-color:var(--glass-border);
+              box-shadow:0 2px 10px rgba(31,38,135,.2), inset 0 1px 0 #fff; }
+@media (hover:hover) { .tab:not(.active):hover { background:rgba(255,255,255,.28); color:var(--text); } }
 
-/* Live camera preview */
+/* ---------- Card (frosted glass tinted with your card colour) ---------- */
+.card { padding:26px 22px; border-radius:30px; background:var(--card-tint);
+        box-shadow:0 10px 40px rgba(31,38,135,.28), inset 0 1px 0 rgba(255,255,255,.65),
+                   inset 0 -1px 0 rgba(255,255,255,.12);
+        transition:box-shadow .3s; }
+@supports (background:color-mix(in srgb, red 50%, transparent)) {
+  .card { background:color-mix(in srgb, var(--card) 34%, transparent); }
+}
+.card.detected { box-shadow:0 0 0 2px var(--good), 0 10px 50px rgba(79,214,160,.45),
+                            inset 0 1px 0 rgba(255,255,255,.65); }
+
+/* Small status chip */
+#mic-status { display:inline-block; font-size:.9rem; color:var(--muted); margin-bottom:16px;
+              padding:6px 14px; border-radius:99px; background:var(--glass);
+              box-shadow:inset 0 1px 0 rgba(255,255,255,.6); transition:color .3s, box-shadow .3s; }
+#mic-status.on { color:#056b48; box-shadow:0 0 14px rgba(79,214,160,.55), inset 0 1px 0 rgba(255,255,255,.6); }
+
+/* ---------- Live camera preview ---------- */
 #cam-wrap { margin-bottom:14px; }
-#cam-wrap canvas { width:100%; max-width:260px; height:auto; border-radius:20px; background:#000;
-                   box-shadow:0 6px 24px rgba(0,0,0,.4); }
+#cam-wrap canvas { width:100%; max-width:260px; height:auto; border-radius:22px; background:#000;
+                   border:1px solid var(--glass-border); box-shadow:0 8px 28px rgba(31,38,135,.35); }
 
-/* Result visual */
+/* ---------- Result visual ---------- */
 #visual { position:relative; height:190px; display:flex; align-items:center; justify-content:center; }
-#emoji { font-size:92px; line-height:1.1; position:relative; z-index:1; }
-#img { max-height:180px; max-width:100%; border-radius:20px; display:none; object-fit:contain;
-       position:relative; z-index:1; box-shadow:0 0 0 3px var(--good), 0 0 40px rgba(79,214,160,.55); }
+#emoji { font-size:92px; line-height:1.1; position:relative; z-index:1;
+         filter:drop-shadow(0 8px 14px rgba(31,38,135,.3)); }
+#img { max-height:180px; max-width:100%; border-radius:22px; display:none; object-fit:contain;
+       position:relative; z-index:1; border:1px solid var(--glass-border);
+       box-shadow:0 0 0 3px var(--good), 0 0 40px rgba(79,214,160,.55); }
 #ring { position:absolute; width:120px; height:120px; border-radius:50%; border:3px solid var(--good);
         opacity:0; pointer-events:none; }
 #ring.go { animation: ripple .8s ease-out; }
@@ -44,24 +103,117 @@ h1 { font-size:1.5rem; margin:8px 0 16px; }
 #label { font-size:1.6rem; font-weight:700; margin:8px 0 4px; }
 #hint { color:var(--muted); font-size:.95rem; min-height:1.4em; margin-bottom:18px; }
 
-.btn { width:100%; padding:16px; font-size:1.05rem; font-weight:600; border:0; border-radius:16px;
-       background:var(--accent); color:#fff; cursor:pointer; transition:transform .1s, opacity .2s; }
-.btn:active { transform:scale(.98); }
+/* ---------- Buttons (translucent glass with a glow on hover) ---------- */
+.btn { position:relative; width:100%; padding:16px; font-size:1.05rem; font-weight:700; letter-spacing:.01em;
+       border-radius:20px; color:var(--text); cursor:pointer; background:var(--glass-strong);
+       box-shadow:0 6px 20px rgba(31,38,135,.22), inset 0 1px 0 rgba(255,255,255,.85),
+                  inset 0 -1px 0 rgba(255,255,255,.15);
+       transition:transform .15s, box-shadow .25s, background .25s, opacity .2s; }
+@media (hover:hover) {
+  .btn:not(:disabled):hover { background:rgba(255,255,255,.58); transform:translateY(-1px);
+    box-shadow:0 10px 28px rgba(31,38,135,.28), 0 0 26px rgba(255,255,255,.75),
+               inset 0 1px 0 #fff, inset 0 -1px 0 rgba(255,255,255,.2); }
+}
+.btn:active { transform:translateY(0) scale(.98); }
+.btn:focus-visible, .tab:focus-visible { outline:2px solid #fff; outline-offset:2px; }
 .btn:disabled { opacity:.6; cursor:wait; }
-.btn.stop { background:#e5576b; }
-.btn.secondary { background:#262b4a; margin-top:10px; padding:12px; font-size:.95rem; }
+.btn.stop { background:rgba(229,87,107,.72); color:#fff; border-color:rgba(255,255,255,.55);
+            text-shadow:0 1px 2px rgba(0,0,0,.25); }
+@media (hover:hover) { .btn.stop:not(:disabled):hover { background:rgba(229,87,107,.88);
+                       box-shadow:0 10px 28px rgba(229,87,107,.45), 0 0 26px rgba(229,87,107,.6), inset 0 1px 0 rgba(255,255,255,.7); } }
+.btn.secondary { background:var(--glass); margin-top:10px; padding:12px; font-size:.95rem; font-weight:600; }
 
+/* ---------- Confidence bars (thin and glowing) ---------- */
 #bars { margin-top:22px; text-align:left; }
-.row { display:grid; grid-template-columns:110px 1fr 42px; align-items:center; gap:8px; margin:8px 0; font-size:.9rem; }
+.row { display:grid; grid-template-columns:110px 1fr 42px; align-items:center; gap:10px; margin:10px 0; font-size:.9rem; }
 .row span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.track { background:#262b4a; border-radius:99px; height:10px; overflow:hidden; }
-.fill { height:100%; background:var(--accent); width:0; transition:width .15s; }
-.pct { color:var(--muted); text-align:right; }
+.track { background:rgba(255,255,255,.45); border-radius:99px; height:7px; overflow:hidden;
+         box-shadow:inset 0 1px 2px rgba(31,38,135,.25); }
+.fill { height:100%; width:0; border-radius:99px; background:linear-gradient(90deg,#ac1804,#ff7a59);
+        box-shadow:0 0 10px rgba(255,122,89,.8); transition:width .15s; }
+.pct { color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
 
-details { margin-top:20px; text-align:left; color:var(--muted); font-size:.9rem; }
-summary { cursor:pointer; }
+/* ---------- Settings panel ---------- */
+details { margin-top:20px; text-align:left; color:var(--muted); font-size:.9rem;
+          padding:12px 14px; border-radius:18px; background:var(--glass);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.55); }
+summary { cursor:pointer; font-weight:600; color:var(--text); }
 details small { display:block; margin-top:12px; }
-input[type=text] { width:100%; margin-top:6px; padding:12px; border-radius:12px; border:1px solid #2e3558;
-                   background:#10142a; color:var(--text); font-size:.9rem; }
+input[type=text] { width:100%; margin-top:6px; padding:12px 14px; border-radius:14px;
+                   background:rgba(255,255,255,.5); color:var(--text); font-size:.9rem;
+                   box-shadow:inset 0 1px 3px rgba(31,38,135,.18); }
+input[type=text]:focus { outline:2px solid #fff; background:rgba(255,255,255,.7); }
 label.slider { display:block; margin-top:14px; }
-input[type=range] { width:100%; }
+input[type=range] { width:100%; accent-color:var(--card); }
+
+/* =====================================================================
+   TWO-COLUMN LAYOUT: main card on the left, "Classes" card slides in on the right
+   ===================================================================== */
+.layout { display:flex; justify-content:center; align-items:flex-end; }   /* flex-end: classes card lines up with the bottom of the main card */
+.col-main { flex:0 1 440px; min-width:0; }
+
+.side { flex:0 1 auto; min-width:0; width:0; opacity:0; padding:0; margin-left:0; border-width:0; overflow:hidden; text-align:left;
+        transition:width .45s cubic-bezier(.2,.9,.3,1), opacity .35s ease .1s,
+                   margin-left .45s ease, padding .45s ease, border-width .45s ease; }
+.side.show { width:440px; opacity:1; padding:26px 22px; margin-left:18px; border-width:1px;
+             overflow-y:auto; }      /* same width as the main card; height is synced to it by script.js; scrolls if you have MANY classes */
+.side h2 { min-width:256px; margin:0 0 6px; font-size:.8rem; text-transform:uppercase;
+           letter-spacing:.08em; color:var(--muted); }
+.side #bars { min-width:256px; margin-top:6px; }
+
+/* Spread the classes evenly down the whole card so there is no empty space at the bottom */
+.side.show { display:flex; flex-direction:column; }
+.side.show #bars { flex:1 0 auto; display:flex; flex-direction:column; justify-content:space-evenly; }
+.side.show .row { margin:0; padding:6px 0; }
+
+/* Short laptop screens: tighten the left card so nothing needs scrolling.
+   In camera mode the live preview and the result picture sit side by side. */
+@media (min-width:861px) and (max-height:820px) {
+  body { padding-top:12px; padding-bottom:12px; }
+  h1 { margin:0 0 10px; font-size:1.35rem; }
+  .tabs { margin-bottom:10px; }
+  .col-main .card { padding:16px 20px; }
+  #mic-status { margin-bottom:10px; }
+  #visual { height:120px; }
+  #emoji { font-size:64px; }
+  #img { max-height:110px; }
+  #label { font-size:1.4rem; margin:4px 0 2px; }
+  #hint { margin-bottom:10px; }
+  details { margin-top:10px; padding:10px 14px; }
+  .btn { padding:13px; }
+  .btn.secondary { padding:10px; margin-top:8px; }
+
+  .col-main .card:has(#cam-wrap:not([hidden])) { display:grid; grid-template-columns:1fr 1fr; column-gap:12px; align-items:center; }
+  .col-main .card:has(#cam-wrap:not([hidden])) > * { grid-column:1 / -1; }
+  .col-main .card:has(#cam-wrap:not([hidden])) > #cam-wrap,
+  .col-main .card:has(#cam-wrap:not([hidden])) > #visual { grid-column:auto; margin:0; }
+  .col-main .card:has(#cam-wrap:not([hidden])) > #mic-status { justify-self:center; }
+  .col-main .card:has(#cam-wrap:not([hidden])) #visual { height:180px; }
+  #cam-wrap canvas { max-width:100%; }
+}
+
+/* Camera mode: no emoji, and the picture area only exists while a picture is shown (no blank gaps) */
+.card.cam-mode #emoji { display:none !important; }
+.card.cam-mode:not(.has-pic) #visual { display:none; }
+.card.cam-mode:not(.has-pic) #hint { margin-top:8px; }
+@media (min-width:861px) and (max-height:820px) {
+  .col-main .card:has(#cam-wrap:not([hidden])).cam-mode:not(.has-pic) > #cam-wrap { grid-column:1 / -1; justify-self:center; margin-bottom:10px; }
+  .col-main .card:has(#cam-wrap:not([hidden])).cam-mode:not(.has-pic) #cam-wrap canvas { max-width:220px; }
+}
+
+/* Phones and narrow windows: there is no room on the right, so the classes card goes underneath */
+@media (max-width:860px) {
+  .layout { flex-direction:column; align-items:center; }
+  .col-main { flex:none; width:100%; max-width:440px; }
+  .side { display:none; }
+  .side.show { display:block; width:100%; max-width:440px; margin:14px 0 0; height:auto !important; overflow:visible; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation:none !important; transition:none !important; }
+}
+/* Browsers without backdrop-filter: make the glass a bit more opaque so text stays readable */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .card { background:rgba(255,235,230,.85); }
+  .tabs, .btn, details, #mic-status { background:rgba(255,255,255,.7); }
+}

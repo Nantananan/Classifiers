@@ -39,7 +39,7 @@ const isIdle = name => /background|noise|ingay|empty|nothing|walang/i.test(name)
 // ---------------------------------------------------------------------
 const $ = id => document.getElementById(id);
 const el = {
-  status:$("mic-status"), emoji:$("emoji"), img:$("img"), label:$("label"), hint:$("hint"),
+  side:$("side"), status:$("mic-status"), emoji:$("emoji"), img:$("img"), label:$("label"), hint:$("hint"),
   btn:$("toggle"), flip:$("flip"), bars:$("bars"), cam:$("cam-wrap"), ring:$("ring"),
   conf:$("conf"), confVal:$("confVal"), settings:$("settings"),
   card:document.querySelector(".card"), tabs:[...document.querySelectorAll(".tab")],
@@ -50,7 +50,7 @@ const MODES = {
            start:"Start Listening", off:"🎤 Microphone is off", on:"🎤 Listening...",
            go:"Make a sound!", none:"No clear sound" },
   image: { key:"tmImageUrl", def:DEFAULT_IMAGE_URL, input:$("imageUrl"), box:$("imageBox"),
-           start:"Start Camera", off:"📷 Camera is off", on:"📷 Camera is on",
+           start:"Start Camera", off:"Camera is off", on:"Camera is on",
            go:"Point the camera at something", none:"Nothing detected" },
 };
 
@@ -75,7 +75,7 @@ function normalizeUrl(u) {
 
 function buildBars(labels) {
   el.bars.innerHTML = labels.map((l, i) => `
-    <div class="row"><span>${emojiFor(l)} ${l}</span>
+    <div class="row"><span>${mode === "sound" ? emojiFor(l) + " " : ""}${l}</span>
       <div class="track"><div class="fill" id="f${i}"></div></div>
       <span class="pct" id="p${i}">0%</span></div>`).join("");
   labels.forEach(findImage); // preload pictures so they appear instantly
@@ -87,16 +87,18 @@ function resetUI() {
   el.btn.textContent = m.start; el.btn.classList.remove("stop");
   el.emoji.style.display = ""; el.img.style.display = "none";
   el.emoji.textContent = "🔇"; el.label.textContent = "—"; el.hint.textContent = "Press Start...";
-  el.card.classList.remove("detected");
+  el.card.classList.remove("detected", "has-pic");
+  el.side.classList.remove("show");   // hide the classes card
 }
 
 function runningUI() {
   const m = MODES[mode];
   el.status.textContent = m.on; el.status.classList.add("on");
   el.btn.textContent = "Stop"; el.btn.classList.add("stop");
-  el.emoji.style.display = "👀"; el.img.style.display = "none";
+  el.emoji.style.display = ""; el.img.style.display = "none";
   el.emoji.textContent = "👂"; el.label.textContent = "Listening..."; el.hint.textContent = m.go;
   if (mode === "image") el.emoji.textContent = "👀", el.label.textContent = "Looking...";
+  el.side.classList.add("show");      // slide the classes card in on the right
 }
 
 // ---------- Mode switching ----------
@@ -105,6 +107,7 @@ async function setMode(m) {
   mode = m;
   el.tabs.forEach(t => t.classList.toggle("active", t.dataset.mode === m));
   el.flip.hidden = m !== "image";
+  el.card.classList.toggle("cam-mode", m === "image");   // camera mode: no emoji, no empty picture area
   el.cam.hidden = true;
   el.bars.innerHTML = "";
   resetUI();
@@ -209,7 +212,7 @@ function onScores(labels, scores) {
     el.emoji.textContent = mode === "image" ? "👀" : "👂";
     el.label.textContent = mode === "image" ? "Looking..." : "Listening...";
     el.hint.textContent = isIdle(name) ? MODES[mode].none : "Not sure...";
-    el.card.classList.remove("detected"); showToken++;
+    el.card.classList.remove("detected", "has-pic"); showToken++;
     lastLabel = null; return;
   }
   el.label.textContent = name;
@@ -217,6 +220,14 @@ function onScores(labels, scores) {
   if (lastLabel !== name) show(name);
   lastLabel = name;
 }
+
+// Keep the Classes card exactly as tall as the main card (desktop layout only)
+function syncSideHeight() {
+  el.side.style.height = window.matchMedia("(min-width:861px)").matches ? el.card.offsetHeight + "px" : "";
+}
+if ("ResizeObserver" in window) new ResizeObserver(syncSideHeight).observe(el.card);
+window.addEventListener("resize", syncSideHeight);
+syncSideHeight();
 
 // Look for the class picture: IMAGES override first, then images/<class>.jpg/.jpeg/.png/.webp
 const imgCache = {};
@@ -252,4 +263,5 @@ async function show(name) {
   target.classList.add(src ? "reveal" : "hit");
   el.ring.classList.remove("go"); void el.ring.offsetWidth; el.ring.classList.add("go");
   el.card.classList.add("detected");
+  el.card.classList.toggle("has-pic", !!src);
 }
